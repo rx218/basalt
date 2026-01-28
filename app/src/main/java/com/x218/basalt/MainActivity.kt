@@ -53,21 +53,22 @@ class MainActivity : ComponentActivity() {
 	ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
 	ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)
 
+    // Activity Result Launcher
     val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-    	    // fine location granted
+		// fine location granted
                 perms.fine = true
             }
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-    	    // only coarse location granted
-    	    perms.coarse = true
+		// only coarse location granted
+		perms.coarse = true
             }
             else -> {
-    	    // No location granted, show error
-    	    LocationDialog()
+		// No location granted, show error
+		LocationDialog()
             }
         }
     }

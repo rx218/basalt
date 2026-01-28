@@ -16,6 +16,5 @@ fun Header() {
     Row() {
 	BasaltIcon()
 	HelpButton()
-	Preferences()
     }
 }
