@@ -16,4 +16,8 @@
 
 <resources>
     <string name="Basalt"></string>
+    <string name="location_info">Location Info</string>
+    <string name="app_logo_description">Qibla Finder Logo</string>
+    <string name="app_name">QiblaFinder</string>
+    <string name="info_desc">Info</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.x218.basalt
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,18 +13,18 @@ import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
 
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.location.Location
 
-import android.Manifest.permission
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
-import androidx.activity.result.ActivityResultCaller
-import androidx.activity.result.ActivityResultLauncher
-
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-
-import com.x218.basalt.ui
+import android.location.LocationListener
+import android.location.LocationManager
+import android.location.LocationManager.GPS_PROVIDER
+import android.os.Build
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
+import com.x218.basalt.ui.PermissionDialog
+import com.x218.basalt.ui.theme.MyApplicationTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,20 +39,16 @@ class MainActivity : ComponentActivity() {
         override fun onLocationChanged(location: Location) {
             mContext.updateLocation(location)
         }
-
-        // called in some Android version and fails
-        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        }
     }
 
     // Permissions
-    val perms = PermissionState(false, false)
-    val compass = CompassState(0.0f, 0.0f)
-    val KaabaLocation = Location(GPS_PROVIDER)
+    val perms = PermissionState(coarse = false, fine = false)
+    val compass = CompassState(kaabaBearing = 0.0f, north = 0.0f)
+    val kaabaLocation = Location(GPS_PROVIDER)
 
-    val shouldShowRationale =
-	ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
-	ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+    val showRationale =
+	    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
+	    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     // Activity Result Launcher
     val locationPermissionRequest = registerForActivityResult(
@@ -59,73 +56,76 @@ class MainActivity : ComponentActivity() {
     ) { permissions ->
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-		// fine location granted
+		        // fine location granted
                 perms.fine = true
             }
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-		// only coarse location granted
-		perms.coarse = true
+		        // only coarse location granted
+		        perms.coarse = true
             }
             else -> {
-		// No location granted, show error
-		LocationDialog()
+		        // No location granted, show error
+                perms.coarse = false
+                perms.fine = false
             }
         }
     }
 
-    val locationManager: LocationManager? = null
-    val locationListener: MyLocationListener? = null
+    // val locationManager: LocationManager? = null
+    val locationListener: LocationListener = MyLocationListener(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-	KaabaLocation.setLatitude(21.2445)
-	KaabaLocation.setLongitude(39.82617)
+	    kaabaLocation.latitude = 21.2445
+        kaabaLocation.longitude = 39.82617
 
-	locationManager.getLastKnownLocation(GPS_PROVIDER)
-	locationManager.requestLocationUpdates(GPS_PROVIDER, 1000, 0.0f, locationListener)
+    	requestPermission()
 
-	checkPermissions()
-	requestPermission()
+        val locationManager = this.getSystemService(LOCATION_SERVICE) as LocationManager
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermission()
+        }
+        locationManager.getLastKnownLocation(GPS_PROVIDER)
+        locationManager.requestLocationUpdates(GPS_PROVIDER, 1000, 0.0f, locationListener)
 
-	locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            when {
+                !locationManager.hasProvider(GPS_PROVIDER) -> {
+                    // No GPS error
+                }
+                !locationManager.isProviderEnabled(GPS_PROVIDER) -> {
+                    // GPS disabled
+                }
+                !locationManager.isLocationEnabled -> {
+                    // Location disabled
+                }
+            }
+        }
 
-	when {
-	    !hasProvider(GPS_PROVIDER) -> {
-		// No GPS error
-	    }
-	    !isProviderEnabled(GPS_PROVIDER) -> {
-		// GPS disabled
-	    }
-	    !isLocationEnabled() -> {
-		// Location disabled
-	    }
-	}
-
-	enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.auto(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            )
-        )
+        enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
         setContent {
+            MainScreen(perms)
             MyApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainNavigation()
+                    MainScreen(perms)
                 }
             }
         }
     }
 
-    fun updateLocation(Location location) {
-	this.bearingKaaba = location.bearingTo(KaabaLocation)
+    fun updateLocation(location: Location) {
+	    this.compass.kaabaBearing = location.bearingTo(kaabaLocation)
     }
 
     fun requestPermission() {
@@ -136,10 +136,10 @@ class MainActivity : ComponentActivity() {
 		return
 	    }
 	    // Show rationale dialog if needed
-	    showRationale -> { LocationDialog() }
+	    showRationale -> { }
 	    else -> {
 		// launch permission request
-		locationPermmissionRequest.launch(
+		this.locationPermissionRequest.launch(
 		    arrayOf(
 			Manifest.permission.ACCESS_FINE_LOCATION,
 			Manifest.permission.ACCESS_COARSE_LOCATION
@@ -148,11 +148,7 @@ class MainActivity : ComponentActivity() {
 	    }
 	}
     }
-
-    fun checkPermissions() {
-	this.perms.coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-	this.perms.fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
 }
 
-data class PermissionState(val coarse: Boolean, val fine: Boolean)
+data class PermissionState(var coarse: Boolean, var fine: Boolean)
+data class CompassState(var kaabaBearing: Float, var north: Float)

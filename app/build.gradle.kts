@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 /*
  * Copyright (C) 2022 The Android Open Source Project
  *
@@ -30,7 +32,7 @@ android {
 
     defaultConfig {
         applicationId = "com.x218.basalt"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -66,11 +68,10 @@ android {
         compose = true
         aidl = false
         buildConfig = false
-        renderScript = false
         shaders = false
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -79,6 +80,8 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.material.icons.core)
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
