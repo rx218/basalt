@@ -13,6 +13,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
 
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.location.Location
 
 import android.location.LocationListener
@@ -45,6 +47,7 @@ class MainActivity : ComponentActivity() {
     val perms = PermissionState(coarse = false, fine = false)
     val compass = CompassState(kaabaBearing = 0.0f, north = 0.0f)
     val kaabaLocation = Location(GPS_PROVIDER)
+    val sensors = SensorState(null, null)
 
     val showRationale =
 	    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
@@ -73,14 +76,13 @@ class MainActivity : ComponentActivity() {
 
     // val locationManager: LocationManager? = null
     val locationListener: LocationListener = MyLocationListener(this)
+    val locationManager = this.getSystemService(LOCATION_SERVICE) as LocationManager
+    val sensorManager: SensorManager = this.getSystemService(SENSOR_SERVICE) as SensorManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
 	    kaabaLocation.latitude = 21.2445
         kaabaLocation.longitude = 39.82617
 
-    	requestPermission()
-
-        val locationManager = this.getSystemService(LOCATION_SERVICE) as LocationManager
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -108,17 +110,25 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        if(sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null) {
+            sensors.magnet = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+        }
+
+        if((sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION)) != null) {
+
+        }
+
         enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen(perms)
+            MainScreen(perms, compass)
             MyApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(perms)
+                    MainScreen(perms, compass)
                 }
             }
         }
@@ -130,13 +140,8 @@ class MainActivity : ComponentActivity() {
 
     fun requestPermission() {
 	when {
-	    // Test if we have permission
-	    perms.coarse || perms.fine -> {
-		// continue as usual
-		return
-	    }
 	    // Show rationale dialog if needed
-	    showRationale -> { }
+	    showRationale -> {}
 	    else -> {
 		// launch permission request
 		this.locationPermissionRequest.launch(
@@ -152,3 +157,5 @@ class MainActivity : ComponentActivity() {
 
 data class PermissionState(var coarse: Boolean, var fine: Boolean)
 data class CompassState(var kaabaBearing: Float, var north: Float)
+
+data class SensorState(var orient: Sensor?, var magnet: Sensor?)
