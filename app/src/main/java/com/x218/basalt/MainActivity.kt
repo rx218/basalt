@@ -9,12 +9,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 
-import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
 
 import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorManager
 import android.location.Location
 
 import android.location.LocationListener
@@ -23,8 +20,8 @@ import android.location.LocationManager.GPS_PROVIDER
 import android.os.Build
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
-import com.x218.basalt.ui.PermissionDialog
+import com.x218.basalt.data.PermissionState
+import com.x218.basalt.ui.MainScreen
 import com.x218.basalt.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,7 +44,6 @@ class MainActivity : ComponentActivity() {
     val perms = PermissionState(coarse = false, fine = false)
     val compass = CompassState(kaabaBearing = 0.0f, north = 0.0f)
     val kaabaLocation = Location(GPS_PROVIDER)
-    val sensors = SensorState(null, null)
 
     val showRationale =
 	    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
@@ -77,7 +73,6 @@ class MainActivity : ComponentActivity() {
     // val locationManager: LocationManager? = null
     val locationListener: LocationListener = MyLocationListener(this)
     val locationManager = this.getSystemService(LOCATION_SERVICE) as LocationManager
-    val sensorManager: SensorManager = this.getSystemService(SENSOR_SERVICE) as SensorManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
 	    kaabaLocation.latitude = 21.2445
@@ -110,25 +105,17 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if(sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null) {
-            sensors.magnet = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-        }
-
-        if((sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION)) != null) {
-
-        }
-
         enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen(perms, compass)
+            MainScreen(perms, compass, kaabaLocation)
             MyApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(perms, compass)
+                    MainScreen(perms, compass, kaabaLocation)
                 }
             }
         }
@@ -139,23 +126,20 @@ class MainActivity : ComponentActivity() {
     }
 
     fun requestPermission() {
-	when {
-	    // Show rationale dialog if needed
-	    showRationale -> {}
-	    else -> {
-		// launch permission request
-		this.locationPermissionRequest.launch(
-		    arrayOf(
-			Manifest.permission.ACCESS_FINE_LOCATION,
-			Manifest.permission.ACCESS_COARSE_LOCATION
-		    )
-		)
-	    }
-	}
+        when {
+            // Show rationale dialog if needed
+            showRationale -> {}
+            else -> {
+                // launch permission request
+                this.locationPermissionRequest.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+        }
     }
 }
 
-data class PermissionState(var coarse: Boolean, var fine: Boolean)
 data class CompassState(var kaabaBearing: Float, var north: Float)
-
-data class SensorState(var orient: Sensor?, var magnet: Sensor?)

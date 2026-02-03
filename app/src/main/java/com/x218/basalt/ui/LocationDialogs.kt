@@ -11,18 +11,20 @@ import kotlin.system.exitProcess
 @Preview
 fun PermissionDialog() {
     AlertDialog(onDismissRequest = { exitProcess(0) },
-    title = {
-        Text("title")
-    }, text = {
-        Text("content")
-    }, confirmButton = {
-        TextButton(onClick = {
-            // launch permission utility
-        }) {
-            Text("Okay")
+        title = {
+            Text("Grant Location Permission")
+        }, text = {
+            Text(
+                "Qibla finder" +
+                        " app requires location permission to work. " +
+                        "Please grant the required permissions"
+            )
+        }, confirmButton = {
+            TextButton(onClick = {
+                // launch permission utility
+            }) {
+                Text("Okay")
+            }
         }
-    })
+    )
 }
-
-@Composable
-fun GPSDialog() {}

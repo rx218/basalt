@@ -5,7 +5,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 
-fun getAngleNorth(sObj: SensorDataObject): FloatArray {
+fun getAzimuth(sObj: SensorDataObject): Float {
     val R = FloatArray(9)
     val I = FloatArray(9)
     val gravity = sObj.gravity
@@ -15,7 +15,7 @@ fun getAngleNorth(sObj: SensorDataObject): FloatArray {
     SensorManager.getRotationMatrix(R, I, gravity, geomagnetic)
     SensorManager.getOrientation(R, values)
 
-    return values
+    return values[0]
 }
 
 fun initializeSensorData(sm: SensorManager): SensorDataObject {

@@ -42,11 +42,12 @@ fun getLocation(lm: LocationManager, mContext: Context): Location {
         listener
     )
     // Wait until we are provided a location
-    while (location == null) {}
+    //while (location == null) {}
+    TODO("See for a way to wait for location value. also see if it even is necessary")
     // We only need location once, so remove updates after
     lm.removeUpdates(listener)
 
-    return location
+    return location!!
 }
 
 fun checkPermissions(mContext: Context): Boolean {
@@ -61,7 +62,7 @@ fun checkPermissions(mContext: Context): Boolean {
     return coarseGranted && fineGranted
 }
 
-fun checkGPSprovider(lm: LocationManager): Boolean {
+fun checkGpsProvider(lm: LocationManager): Boolean {
     var locationEnabled: Boolean
     val providers = lm.getProviders(true)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

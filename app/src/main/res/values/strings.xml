@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="Basalt"></string>
+    <string name="Basalt">Basalt</string>
     <string name="location_info">Location Info</string>
     <string name="app_logo_description">Qibla Finder Logo</string>
     <string name="app_name">QiblaFinder</string>
