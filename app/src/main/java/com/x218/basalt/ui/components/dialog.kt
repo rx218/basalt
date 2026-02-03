@@ -1,4 +1,4 @@
-package com.x218.basalt.ui
+package com.x218.basalt.ui.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
