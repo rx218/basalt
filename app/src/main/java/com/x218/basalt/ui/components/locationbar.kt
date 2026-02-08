@@ -3,7 +3,11 @@ package com.x218.basalt.ui.components
 import android.location.Location
 import android.location.LocationManager
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,14 +29,12 @@ import com.x218.basalt.R
 import com.x218.basalt.data.PermissionState
 
 @Composable
-fun LocationBar(location: Location, perms: PermissionState) {
+fun LocationBar(location: Location, perms: PermissionState, onClickLocation: () -> Unit = {}) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            //.padding(16.dp)
-            .height(48.dp)
-        ,
-        verticalAlignment = Alignment.CenterVertically
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         val tint: Color = when (perms) {
             PermissionState(coarse = true, fine = true) -> Color.Green
@@ -41,8 +43,7 @@ fun LocationBar(location: Location, perms: PermissionState) {
             else -> Color.Gray
         }
         IconButton(
-            onClick = { TODO("Show help dialog") },
-            modifier = Modifier.padding(3.dp)
+            onClick = onClickLocation
         ) {
             Icon(
                 imageVector =  Icons.Filled.LocationOn,
@@ -54,24 +55,24 @@ fun LocationBar(location: Location, perms: PermissionState) {
         VerticalDivider(color = MaterialTheme.colorScheme.primary)
 
         Row (
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = location.latitude.toString(),
+                text = location.latitude.toString() + "°",
                 style = MaterialTheme.typography.displayMedium
             )
             VerticalDivider(color = MaterialTheme.colorScheme.secondary)
             Text(
-                text = location.longitude.toString(),
+                text = location.longitude.toString() + "°",
                 style = MaterialTheme.typography.displayMedium
             )
         }
     }
 }
 
-@Preview
+@Preview(widthDp = 900)
 @Composable
 fun PreviewLocationBar() {
     LocationBar(
@@ -81,6 +82,6 @@ fun PreviewLocationBar() {
             latitude = 67.0
             longitude = 167.0
         },
-        PermissionState(coarse = false, fine = true)
+        PermissionState(coarse = true, fine = true)
     )
 }
