@@ -1,8 +1,14 @@
 package com.x218.basalt.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -10,25 +16,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.x218.basalt.data.Prayer
 
 @Composable
 fun PrayerTimeDrawer() {
-    PrayerTime()
+    // Next prayer
+    Text("Next prayer")
+    PrayerTime(Prayer.FAJR)
+
+    HorizontalDivider()
+
+    // list of prayers
+    Column {
+        for (prayer in Prayer.entries) {
+            PrayerTime(prayer)
+        }
+    }
 }
 
 @Composable
-fun PrayerTime() {
+fun PrayerTime(prayer: Prayer) {
     Row(
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .padding(4.dp)
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "FAJR",
+            text = prayer.displayName,
             style = MaterialTheme.typography.displaySmall
         )
-        VerticalDivider()
+        VerticalDivider(
+            modifier = Modifier.padding(16.dp, 0.dp)
+        )
         Text(
-            text = "14:00",
+            // TODO
+            text = "TODO",
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.displayMedium
         )
