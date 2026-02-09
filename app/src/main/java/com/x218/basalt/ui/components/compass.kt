@@ -25,10 +25,9 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun Compass(compassState: CompassState) {
-    Box {
-        Spacer(
-            modifier = Modifier.matchParentSize()
-        )
+    Box (
+        contentAlignment = Alignment.Center
+    ) {
         Image(
             painter = painterResource(id = R.drawable.rose),
             modifier = Modifier

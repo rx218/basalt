@@ -13,13 +13,15 @@ fun PermissionDialog() {
     AlertDialog(onDismissRequest = { exitProcess(0) },
         title = {
             Text("Grant Location Permission")
-        }, text = {
+        },
+        text = {
             Text(
                 "Qibla finder" +
                         " app requires location permission to work. " +
                         "Please grant the required permissions"
             )
-        }, confirmButton = {
+        },
+        confirmButton = {
             TextButton(onClick = {
                 // launch permission utility
             }) {

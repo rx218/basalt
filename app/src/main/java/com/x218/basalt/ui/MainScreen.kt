@@ -30,7 +30,7 @@ fun MainScreen(perms: PermissionState, compassState: CompassState, location: Loc
                 Header()
             },
             sheetContent = {
-                PrayerTimeDrawer()
+                PrayerTimeDrawer(location)
             }
         ) {
             Column(

@@ -72,7 +72,7 @@ fun LocationBar(location: Location, perms: PermissionState, onClickLocation: () 
     }
 }
 
-@Preview(widthDp = 900)
+@Preview(widthDp = 640)
 @Composable
 fun PreviewLocationBar() {
     LocationBar(
