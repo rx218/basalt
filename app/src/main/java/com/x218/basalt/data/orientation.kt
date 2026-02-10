@@ -4,12 +4,16 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 
-fun getAzimuth(sObj: SensorDataObject): Float {
+fun getAzimuth(gravity: FloatArray, geomagnetic: FloatArray): Float {
     val R = FloatArray(9)
     val I = FloatArray(9)
-    val gravity = sObj.gravity
-    val geomagnetic = sObj.geomagnetic
     val values = FloatArray(3)
 
     SensorManager.getRotationMatrix(R, I, gravity, geomagnetic)
@@ -18,7 +22,7 @@ fun getAzimuth(sObj: SensorDataObject): Float {
     return values[0]
 }
 
-fun initializeSensorData(sm: SensorManager): SensorDataObject {
+fun getAzimuthFlow(sm: SensorManager): Flow<Float> {
     val accSensor = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     val magSensor = sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
@@ -26,62 +30,33 @@ fun initializeSensorData(sm: SensorManager): SensorDataObject {
         TODO()
     }
 
-    val sObj = SensorDataObject(FloatArray(3), FloatArray(3))
-
-    val accListener = AccelerationSensorListener(sObj)
-    val magListener = MagnetSensorListener(sObj)
-
-    sm.registerListener(accListener, accSensor, SensorManager.SENSOR_DELAY_NORMAL)
-    sm.registerListener(magListener, magSensor, SensorManager.SENSOR_DELAY_NORMAL)
-
-    sm.unregisterListener(accListener)
-    sm.unregisterListener(magListener)
-
-    return sObj
-}
-
-class AccelerationSensorListener(val sObj: SensorDataObject): SensorEventListener {
-    // Do nothing ig
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        sObj.gravity = if (event?.values != null) {
-            event.values
-        } else {
-            FloatArray(3)
+    val accFlow = callbackFlow {
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent?) {
+                event?.let { trySend(it.values.copyOf()) }
+            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
+
+        sm.registerListener(listener, accSensor, SensorManager.SENSOR_DELAY_UI)
+
+        awaitClose { sm.unregisterListener(listener) }
     }
-}
 
-class MagnetSensorListener(val sObj: SensorDataObject): SensorEventListener {
-    // Do nothing ig
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        sObj.geomagnetic = if (event?.values != null) {
-            event.values
-        } else {
-            FloatArray(3)
+    val magFlow = callbackFlow {
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent?) {
+                event?.let { trySend(it.values.copyOf()) }
+            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
-    }
-}
 
-data class SensorDataObject (var gravity: FloatArray, var geomagnetic: FloatArray) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        sm.registerListener(listener, magSensor, SensorManager.SENSOR_DELAY_UI)
 
-        other as SensorDataObject
-
-        if (!gravity.contentEquals(other.gravity)) return false
-        if (!geomagnetic.contentEquals(other.geomagnetic)) return false
-
-        return true
+        awaitClose { sm.unregisterListener(listener) }
     }
 
-    override fun hashCode(): Int {
-        var result = gravity.contentHashCode()
-        result = 31 * result + geomagnetic.contentHashCode()
-        return result
-    }
+    return accFlow
+        .combine (magFlow) { acc, mag -> getAzimuth(acc, mag) }
+        .flowOn(Dispatchers.Default)
 }

@@ -5,19 +5,27 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
 import com.x218.basalt.data.PermissionState
 import com.x218.basalt.data.checkPermissions
 import com.x218.basalt.data.checkGpsProvider
-import com.x218.basalt.data.getAzimuth
+import com.x218.basalt.data.getAzimuthFlow
 import com.x218.basalt.data.getLocation
-import com.x218.basalt.data.initializeSensorData
 import com.x218.basalt.data.requestPermission
 import com.x218.basalt.ui.MainScreen
-
-const val TAG: String = "MainActivity"
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlin.coroutines.ContinuationInterceptor
 
 class MainActivity : ComponentActivity() {
 
@@ -27,10 +35,8 @@ class MainActivity : ComponentActivity() {
 
         val lm = this.getSystemService(LOCATION_SERVICE) as LocationManager
         val sm = this.getSystemService(SENSOR_SERVICE) as SensorManager
-        Log.i(TAG, "LocationManager: $lm , SensorManager: $sm")
 
         val perms = checkPermissions(this)
-        Log.i(TAG, "Checked permissions: perms $perms")
 
         if( perms == PermissionState(false, false)) {
             requestPermission(perms, this)
@@ -48,20 +54,21 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val sObj = initializeSensorData(sm)
-        val northAngle = getAzimuth(sObj)
-        Log.i(TAG, "Sensor data $sObj , $northAngle")
+        val azimuthFlow = getAzimuthFlow(sm)
+            .stateIn(
+                lifecycleScope,
+                SharingStarted.WhileSubscribed(),
+                1.0f
+            )
+
+        val northAngle by azimuthFlow.collectAsState()
 
         val kaabaLocation = Location(LocationManager.GPS_PROVIDER).apply {
             latitude = 21.2445
             longitude = 39.82617
         }
-        Log.println(Log.INFO, "MainActivity", "kaaba location: $kaabaLocation")
 
         val kaabaDirection = location.bearingTo(kaabaLocation)
-        Log.println(Log.INFO, "MainActivity", "Kaaba direction : $kaabaDirection")
-
-        Log.println(Log.INFO, "MainActivity", "Completed all setup")
 
         setContent {
             MainScreen(
