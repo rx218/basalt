@@ -35,11 +35,18 @@ class MainActivity : ComponentActivity() {
         if( perms == PermissionState(false, false)) {
             requestPermission(perms, this)
         }
-        Log.i(TAG, "Obtained permissions $perms")
-        checkGpsProvider(lm)
 
-        val location = getLocation(lm, this)
-        Log.i(TAG, "Obtained location $location")
+        var location by remember { mutableStateOf(Location(LocationManager.GPS_PROVIDER)) }
+
+        if ( perms == PermissionState(false, false) && checkGpsProvider(lm) ) {
+            lifecycleScope.launch {
+                location = getLocation(
+                    lm,
+                    // Get executor from current coroutine
+                    (this.coroutineContext[ContinuationInterceptor] as CoroutineDispatcher).asExecutor()
+                )
+            }
+        }
 
         val sObj = initializeSensorData(sm)
         val northAngle = getAzimuth(sObj)
