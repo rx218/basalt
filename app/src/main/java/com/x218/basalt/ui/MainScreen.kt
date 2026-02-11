@@ -1,18 +1,17 @@
 package com.x218.basalt.ui
 
-import android.location.Location
-import android.location.LocationManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
-import com.x218.basalt.CompassState
-import com.x218.basalt.data.PermissionState
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.x218.basalt.ui.components.Compass
 import com.x218.basalt.ui.components.Header
 import com.x218.basalt.ui.components.LocationBar
@@ -20,28 +19,36 @@ import com.x218.basalt.ui.components.PrayerTimeDrawer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(perms: PermissionState, compassState: CompassState, location: Location) {
-    Column (
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ){
-        BottomSheetScaffold(
-            topBar = {
-                Header()
-            },
-            sheetContent = {
-                PrayerTimeDrawer(location)
-            }
+fun MainScreen(
+    viewModel: MainViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val kaabaBearing = uiState.location.bearingTo(kaabaLocation)
+    val northAngle by viewModel.azimuthFlow.collectAsState()
+
+    BottomSheetScaffold(
+        topBar = {
+            Header()
+        },
+        sheetPeekHeight = 160.dp,
+        sheetContent = {
+            PrayerTimeDrawer(uiState.location)
+        }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Compass(compassState)
-                HorizontalDivider()
-                LocationBar(location, perms)
-                HorizontalDivider()
-            }
+            Compass(
+                north = northAngle,
+                kaabaBearing =  kaabaBearing
+            )
+            HorizontalDivider()
+            LocationBar(
+                location = uiState.location,
+                perms =  uiState.perms
+            )
+            HorizontalDivider()
         }
     }
 }
@@ -49,12 +56,5 @@ fun MainScreen(perms: PermissionState, compassState: CompassState, location: Loc
 @Preview
 @Composable
 fun MainScreenPreview() {
-    MainScreen(
-        PermissionState(coarse = true, fine = true),
-        CompassState(200f, 30f),
-        Location(LocationManager.GPS_PROVIDER).apply {
-            latitude = 25.0
-            longitude = 47.0
-        }
-    )
+    MainScreen(viewModel<MainViewModel>())
 }
