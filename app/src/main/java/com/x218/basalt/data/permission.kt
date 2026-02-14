@@ -8,8 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.activity.ComponentActivity
 
-const val TAG: String = "Permission"
-
 data class PermissionState(var coarse: Boolean, var fine: Boolean)
 
 fun requestPermission(perms: PermissionState, mContext: ComponentActivity) {

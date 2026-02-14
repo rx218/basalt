@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -40,11 +39,16 @@ fun PrayerTimeDrawer(location: Location) {
         } else {
             PrayerTime(Prayer.FAJR, ptimes.first())
         }
+
         HorizontalDivider()
+
+        Text("Prayer Times")
 
         // list of prayers
         Column {
-            prayers.forEach { (prayer, time) -> PrayerTime(prayer, time)}
+            prayers.forEach {
+                    (prayer, time) -> PrayerTime(prayer, time)
+            }
         }
     }
 }
@@ -60,6 +64,7 @@ fun PrayerTime(prayer: Prayer, time: LocalTime) {
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
+            modifier = Modifier.weight(0.7f),
             text = prayer.displayName,
             style = MaterialTheme.typography.displaySmall
         )
@@ -67,8 +72,8 @@ fun PrayerTime(prayer: Prayer, time: LocalTime) {
             modifier = Modifier.padding(16.dp, 0.dp)
         )
         Text(
+            modifier = Modifier.weight(1.3f),
             text = timestr,
-            modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.displayMedium
         )
     }
