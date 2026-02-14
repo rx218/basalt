@@ -5,12 +5,7 @@ import android.location.LocationManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
@@ -24,12 +19,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.x218.basalt.R
 import com.x218.basalt.data.PermissionState
 
 @Composable
 fun LocationBar(location: Location, perms: PermissionState, onClickLocation: () -> Unit = {}) {
+    val lat = if (location.latitude == 0.0) {
+        "--"
+    } else {
+        "${"%.2f".format(location.latitude)}°"
+    }
+    val long = if (location.longitude == 0.0) {
+        "--"
+    } else {
+        "${"%.2f".format(location.longitude)}°"
+    }
+
     Row(
         modifier = Modifier
             .height(IntrinsicSize.Min),
@@ -60,12 +65,12 @@ fun LocationBar(location: Location, perms: PermissionState, onClickLocation: () 
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = location.latitude.toString() + "°",
+                text = lat,
                 style = MaterialTheme.typography.displayMedium
             )
             VerticalDivider(color = MaterialTheme.colorScheme.secondary)
             Text(
-                text = location.longitude.toString() + "°",
+                text = long,
                 style = MaterialTheme.typography.displayMedium
             )
         }
@@ -78,10 +83,11 @@ fun PreviewLocationBar() {
     LocationBar(
         Location(
             LocationManager.GPS_PROVIDER
-        ).apply{
-            latitude = 67.0
-            longitude = 167.0
-        },
+        )
+            .apply {
+                latitude = 67.0
+                longitude = 167.0
+            },
         PermissionState(coarse = true, fine = true)
     )
 }
