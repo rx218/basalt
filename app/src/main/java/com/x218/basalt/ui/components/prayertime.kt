@@ -17,28 +17,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.x218.basalt.data.Prayer
-import com.x218.basalt.data.prayerTimes
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import com.batoulapps.adhan2.CalculationMethod
+import com.batoulapps.adhan2.Coordinates
+import com.batoulapps.adhan2.Prayer
+import com.batoulapps.adhan2.PrayerTimes
+import com.batoulapps.adhan2.data.DateComponents
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Date
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Composable
+@OptIn(ExperimentalTime::class)
 fun PrayerTimeDrawer(location: Location) {
-    val time = LocalTime.now()
+    val date = LocalDate.now()
 
-    val ptimes: List<LocalTime> = prayerTimes(location)
-    val prayers = Prayer.entries.zip(ptimes)
-    val nextPrayer: Pair<Prayer, LocalTime>? = prayers.firstOrNull { time.isBefore(it.second) }
+    val pt = PrayerTimes(
+        Coordinates(location.latitude, location.longitude),
+        DateComponents(date.year, date.monthValue, date.dayOfMonth),
+        CalculationMethod.UMM_AL_QURA.parameters
+    )
+
+    val list = pt.run {
+        listOf(
+            fajr, sunrise, dhuhr, asr, maghrib, isha
+        )
+    }.map {
+        SimpleDateFormat.getTimeInstance().format(Date(it.toEpochMilliseconds()))
+    }.zip(Prayer.entries.filter { it != Prayer.NONE })
+
+    val nextPrayer = if(pt.nextPrayer(Clock.System.now()) != Prayer.NONE) {
+        pt.nextPrayer(Clock.System.now())
+    } else {
+        Prayer.FAJR
+    }
+    val nextPrayerTime =
+        SimpleDateFormat.getTimeInstance().format(Date(pt.timeForPrayer(nextPrayer)!!.toEpochMilliseconds()))
 
     Column {
         // Next prayer
         Text("Next prayer")
-        if(nextPrayer != null) {
-            PrayerTime(nextPrayer.first, nextPrayer.second)
-        } else {
-            PrayerTime(Prayer.FAJR, ptimes.first())
-        }
+        PrayerTime(nextPrayer, nextPrayerTime)
 
         HorizontalDivider()
 
@@ -46,16 +66,13 @@ fun PrayerTimeDrawer(location: Location) {
 
         // list of prayers
         Column {
-            prayers.forEach {
-                    (prayer, time) -> PrayerTime(prayer, time)
-            }
+            list.forEach { PrayerTime(it.second, it.first) }
         }
     }
 }
 
 @Composable
-fun PrayerTime(prayer: Prayer, time: LocalTime) {
-    val timestr = time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+fun PrayerTime(prayer: Prayer, time: String) {
     Row(
         modifier = Modifier
             .padding(4.dp)
@@ -65,7 +82,7 @@ fun PrayerTime(prayer: Prayer, time: LocalTime) {
     ) {
         Text(
             modifier = Modifier.weight(0.7f),
-            text = prayer.displayName,
+            text = prayer.toString(),
             style = MaterialTheme.typography.displaySmall
         )
         VerticalDivider(
@@ -73,7 +90,7 @@ fun PrayerTime(prayer: Prayer, time: LocalTime) {
         )
         Text(
             modifier = Modifier.weight(1.3f),
-            text = timestr,
+            text = time,
             style = MaterialTheme.typography.displayMedium
         )
     }
@@ -86,8 +103,8 @@ fun PreviewPrayerTimeDrawer() {
         Location(
             LocationManager.GPS_PROVIDER
         ).apply{
-            latitude = 67.0
-            longitude = 167.0
+            latitude = 24.0
+            longitude = 46.0
         }
     )
 }

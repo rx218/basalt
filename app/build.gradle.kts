@@ -129,4 +129,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
+
+    // Adhan times library
+    implementation("com.batoulapps.adhan:adhan2:0.0.6")
 }
