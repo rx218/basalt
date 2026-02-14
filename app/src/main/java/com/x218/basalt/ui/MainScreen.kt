@@ -1,8 +1,12 @@
 package com.x218.basalt.ui
 
+import android.location.Location
+import android.location.LocationManager
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -10,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.x218.basalt.data.PermissionState
 import com.x218.basalt.ui.components.Compass
 import com.x218.basalt.ui.components.Header
 import com.x218.basalt.ui.components.LocationBar
@@ -39,8 +45,11 @@ fun MainScreen(
         sheetContent = {
             PrayerTimeDrawer(uiState.location)
         }
-    ) {
+    ) { innerPadding ->
         Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -58,8 +67,47 @@ fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen(northAngle: Float, location: Location, perms: PermissionState) {
+    val kaabaBearing = location.bearingTo(kaabaLocation)
+
+    BottomSheetScaffold(
+        topBar = {
+            Header()
+        },
+        sheetPeekHeight = 160.dp,
+        sheetContent = {
+            PrayerTimeDrawer(location)
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Compass(
+                north = northAngle,
+                kaabaBearing = kaabaBearing
+            )
+            HorizontalDivider()
+            LocationBar(
+                location = location,
+                perms = perms
+            )
+            HorizontalDivider()
+        }
+    }
+}
+
 @Preview
 @Composable
 fun MainScreenPreview() {
-    MainScreen(viewModel<MainViewModel>())
+    val location = Location(LocationManager.GPS_PROVIDER)
+    val perms = PermissionState(coarse = false, fine = false)
+    val northAngle = 30.0f
+    println(location)
+    MainScreen(northAngle, location, perms)
 }
