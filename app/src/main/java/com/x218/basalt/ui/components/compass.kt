@@ -1,9 +1,11 @@
 package com.x218.basalt.ui.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,30 +17,42 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.x218.basalt.CompassState
 import com.x218.basalt.R
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun Compass(compassState: CompassState) {
+fun Compass(north: Float, kaabaBearing: Float) {
+    val northRotation by animateFloatAsState(
+        targetValue = north,
+        animationSpec = spring(stiffness = Spring.StiffnessLow), // Low stiffness = smoother
+        label = "Rose Rotation"
+    )
+
+    val needleRotation by animateFloatAsState(
+        targetValue = kaabaBearing,
+        animationSpec = spring(stiffness = Spring.StiffnessLow), // Low stiffness = smoother
+        label = "Needle Rotation"
+    )
+
     Box (
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .rotate(north)
+            .graphicsLayer(rotationZ = northRotation)
     ) {
         Image(
             painter = painterResource(id = R.drawable.rose),
             modifier = Modifier
-                .align(Alignment.Center)
-                .rotate(compassState.north),
+                .align(Alignment.Center),
             contentDescription = "Compass Rose"
         )
         Image(
             painter = painterResource(id = R.drawable.needle),
             modifier = Modifier
-                .rotate(compassState.kaabaBearing)
+                .rotate(kaabaBearing)
+                .graphicsLayer(rotationZ = needleRotation)
                 .scale(0.75f)
                 .align(Alignment.Center),
             contentDescription = "Needle Kaaba"
@@ -48,23 +62,11 @@ fun Compass(compassState: CompassState) {
 
 @Preview
 @Composable
-fun PreviewCompass() {
-    val cs = CompassState(0f, 90f)
-    Compass(cs)
-    for(i in 0..360) {
-        cs.kaabaBearing += i
-        cs.north -= i/2
-    }
-    runBlocking { delay(1.seconds) }
-}
-
-@Preview
-@Composable
 fun PreviewCompassAdjustable() {
     Column {
         var v1 by remember { mutableFloatStateOf(0f) }
         var v2 by remember { mutableFloatStateOf(0f) }
-        Compass(CompassState(v1, v2))
+        Compass(v1, v2)
         Slider(
             value = v1,
             onValueChange = { v1 = it },
