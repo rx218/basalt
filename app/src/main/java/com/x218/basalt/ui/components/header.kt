@@ -28,8 +28,7 @@ import com.x218.basalt.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Header(
-    onClickInfo: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onClickInfo: () -> Unit = {}
 ) {
     val padding = 4.dp
     TopAppBar(
@@ -51,7 +50,6 @@ fun Header(
         },
         actions = {
             TooltipBox(
-                modifier = modifier,
                 positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
                     TooltipAnchorPosition.Below),
                 tooltip = {

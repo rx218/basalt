@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.Packaging
-
 /*
  * Copyright (C) 2022 The Android Open Source Project
  *
@@ -16,13 +14,8 @@ import com.android.build.api.dsl.Packaging
  * limitations under the License.
  */
 
-@Suppress("DSL_SCOPE_VIOLATION") // Remove when fixed https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.hilt.gradle)
-    alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -36,16 +29,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "com.x218.basalt.HiltTestRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
-        // Enable room auto-migrations
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
     }
 
     buildTypes {
@@ -60,15 +43,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
-        aidl = false
         buildConfig = false
-        shaders = false
     }
 
     packaging {
@@ -91,24 +68,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
-    // Hilt Dependency Injection
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    // Hilt and instrumented tests.
-    androidTestImplementation(libs.hilt.android.testing)
-    kaptAndroidTest(libs.hilt.android.compiler)
-    // Hilt and Robolectric tests.
-    testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.android.compiler)
-
     // Arch Components
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
 
     // Compose
     implementation(libs.androidx.compose.ui)
@@ -131,5 +94,5 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
 
     // Adhan times library
-    implementation("com.batoulapps.adhan:adhan2:0.0.6")
+    implementation(libs.adhan2)
 }

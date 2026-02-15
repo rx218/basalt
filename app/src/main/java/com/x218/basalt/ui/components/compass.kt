@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -39,7 +38,6 @@ fun Compass(north: Float, kaabaBearing: Float) {
     Box (
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .rotate(north)
             .graphicsLayer(rotationZ = northRotation)
     ) {
         Image(
@@ -51,7 +49,6 @@ fun Compass(north: Float, kaabaBearing: Float) {
         Image(
             painter = painterResource(id = R.drawable.needle),
             modifier = Modifier
-                .rotate(kaabaBearing)
                 .graphicsLayer(rotationZ = needleRotation)
                 .scale(0.75f)
                 .align(Alignment.Center),
@@ -70,16 +67,18 @@ fun PreviewCompassAdjustable() {
         Slider(
             value = v1,
             onValueChange = { v1 = it },
-            valueRange = 0f..360f,
-            steps = 10
+            valueRange = -180f..180f
         )
         Text(text = v1.toString())
         Slider(
             value = v2,
             onValueChange = { v2 = it },
-            valueRange = 0f..360f,
-            steps = 10
+            valueRange = -180f..180f
         )
         Text(text = v2.toString())
+        val rot by animateFloatAsState(
+            targetValue = v2
+        )
+        Text(text = "Hi", modifier = Modifier.graphicsLayer(rotationZ = rot))
     }
 }

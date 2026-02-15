@@ -105,9 +105,12 @@ fun MainScreen(northAngle: Float, location: Location, perms: PermissionState) {
 @Preview
 @Composable
 fun MainScreenPreview() {
-    val location = Location(LocationManager.GPS_PROVIDER)
+    val location = Location(LocationManager.GPS_PROVIDER).apply{
+        latitude = 38.0
+        longitude = 41.0
+    }
     val perms = PermissionState(coarse = false, fine = false)
-    val northAngle = 30.0f
+    val northAngle = 0.0f
     println(location)
     MainScreen(northAngle, location, perms)
 }
