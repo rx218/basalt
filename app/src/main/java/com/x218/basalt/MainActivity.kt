@@ -3,7 +3,6 @@ package com.x218.basalt
 import android.annotation.SuppressLint
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -25,7 +24,6 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i("MainActivity", "Entered MainActivity")
 
         val viewModel: MainViewModel by viewModels()
 
@@ -33,11 +31,13 @@ class MainActivity : ComponentActivity() {
         val perms = checkPermissions(this)
         viewModel.updatePerms(perms)
 
+        // Request permissions if not granted
         if( perms == PermissionState(coarse = false, fine = false)) {
             requestPermission(perms, this)
             viewModel.updatePerms(perms)
         }
 
+        // get location asynchronously if permissions are granted and location is enabled
         if ( perms != PermissionState(coarse = false, fine = false) && checkGpsProvider(lm) ) {
             // use lifecycle scope to call suspendable function
             lifecycleScope.launch {

@@ -5,7 +5,6 @@ import android.content.Context.SENSOR_SERVICE
 import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.x218.basalt.data.PermissionState
@@ -42,7 +41,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
 
     fun updatePerms(perms: PermissionState) {
-        Log.i("ViewModel: update perms", "Permissions updated from ${uiState.value.perms} to $perms")
         _uiState.update { currentUiState ->
             currentUiState.copy(
                 perms = perms
@@ -51,7 +49,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateLocation(location: Location) {
-        Log.i("ViewModel: update location", "Received location $location")
         _uiState.update { currentUiState ->
             currentUiState.copy(
                 location = location

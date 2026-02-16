@@ -2,7 +2,6 @@ package com.x218.basalt.ui
 
 import android.location.Location
 import android.location.LocationManager
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,10 +31,6 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsState()
     val kaabaBearing = uiState.location.bearingTo(kaabaLocation)
     val northAngle by viewModel.azimuthFlow.collectAsState()
-    Log.i("MainScreen", "New northAngle $northAngle")
-    Log.i("MainScreen", "kaaba Bearing $kaabaBearing")
-    Log.i("MainScreen", "Permissions : ${uiState.perms}")
-    Log.i("MainScreen", "Location : ${uiState.location}")
 
     BottomSheetScaffold(
         topBar = {

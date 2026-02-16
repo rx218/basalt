@@ -5,16 +5,33 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresPermission
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-// Returns the current location
-// getLocation may take a long time to complete, so it is preferred to invoke it as a coroutine
+/**
+ * Helper function that uses the many android location retrieval
+ * mechanisms to get a single location.
+ * `getLocation` may take a long time to complete, so it is preferred ot invoke it as a coroutine
+ *
+ * Parameter `Executor exec` is used to run the `LocationManager.getCurrentLocation()` function
+ * Provide a non-blocking executor
+ *
+ * Methods used are:
+ * - `LocationManager.getLastKnownLocation()` to get a cached location if available, or else
+ * - `LocationManager.getCurrentLocation()` for new android versions
+ * - `LocationManager.requestLocationUpdates()` for older android versions
+ *
+ * The provider is chosen in the following order, whichever is available first:
+ * 1. LocationManager.FUSED_PROVIDER
+ * 2. LocationManager.PASSIVE_PROVIDER
+ * 3. LocationManager.NETWORK_PROVIDER
+ * 4. LocationManager.GPS_PROVIDER
+ */
 @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
 suspend fun getLocation(lm: LocationManager, exec: Executor): Location {
+    // Get a suitable provider
     val provider = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 lm.isProviderEnabled(LocationManager.FUSED_PROVIDER) -> LocationManager.FUSED_PROVIDER
@@ -36,7 +53,6 @@ suspend fun getLocation(lm: LocationManager, exec: Executor): Location {
                 null,
                 exec,
                 { l: Location ->
-                    Log.i("getLocation", "Using getCurrentLocation")
                     continuation.resume(l)
                 }
             )
@@ -50,7 +66,6 @@ suspend fun getLocation(lm: LocationManager, exec: Executor): Location {
                 object: LocationListener {
                     override fun onLocationChanged(l: Location) {
                         lm.removeUpdates(this)
-                        Log.i("getLocation", "Using requestLocationUpdates")
                         continuation.resume(l)
                     }
                 }
@@ -60,7 +75,7 @@ suspend fun getLocation(lm: LocationManager, exec: Executor): Location {
 }
 
 
-// checks if device has GPS provider and if location is enabled
+/** Checks if device has a GPS provider and if location is enabled */
 fun checkGpsProvider(lm: LocationManager): Boolean {
     val locationEnabled: Boolean
     val hasGPS = lm.getProviders(true)
@@ -73,8 +88,6 @@ fun checkGpsProvider(lm: LocationManager): Boolean {
     } else {
         locationEnabled= true
     }
-
-    Log.i("checkGpsProvider", "locationEnabled: $locationEnabled and hasGPS = $hasGPS")
 
     return locationEnabled && hasGPS
 }
