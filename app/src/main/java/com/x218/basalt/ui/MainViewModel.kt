@@ -24,6 +24,7 @@ val kaabaLocation = Location(LocationManager.GPS_PROVIDER).apply {
 data class UiState(
     val perms: PermissionState = PermissionState(coarse = false, fine = false),
     val location: Location = Location(LocationManager.GPS_PROVIDER),
+    val showDialog: Boolean = false
 )
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -52,6 +53,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { currentUiState ->
             currentUiState.copy(
                 location = location
+            )
+        }
+    }
+
+    fun setShowDialog() {
+        _uiState.update { currentUiState ->
+            currentUiState.copy(
+                showDialog = true
             )
         }
     }

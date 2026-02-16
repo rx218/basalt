@@ -21,6 +21,7 @@ import com.x218.basalt.data.PermissionState
 import com.x218.basalt.ui.components.Compass
 import com.x218.basalt.ui.components.Header
 import com.x218.basalt.ui.components.LocationBar
+import com.x218.basalt.ui.components.PermissionDialog
 import com.x218.basalt.ui.components.PrayerTimeDrawer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +35,7 @@ fun MainScreen(
 
     BottomSheetScaffold(
         topBar = {
-            Header()
+            Header(onClickInfo = { viewModel.setShowDialog() })
         },
         sheetPeekHeight = 160.dp,
         sheetContent = {
@@ -55,16 +56,21 @@ fun MainScreen(
             HorizontalDivider()
             LocationBar(
                 location = uiState.location,
-                perms =  uiState.perms
+                perms =  uiState.perms,
+                onClickLocation = { viewModel.setShowDialog() }
             )
             HorizontalDivider()
         }
+    }
+
+    if(uiState.showDialog) {
+        PermissionDialog(uiState.perms)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(northAngle: Float, location: Location, perms: PermissionState) {
+fun MainScreen(northAngle: Float, location: Location, perms: PermissionState, showDialog: Boolean) {
     val kaabaBearing = location.bearingTo(kaabaLocation)
 
     BottomSheetScaffold(
@@ -95,6 +101,10 @@ fun MainScreen(northAngle: Float, location: Location, perms: PermissionState) {
             HorizontalDivider()
         }
     }
+
+    if(showDialog) {
+        PermissionDialog(perms)
+    }
 }
 
 @Preview
@@ -106,6 +116,6 @@ fun MainScreenPreview() {
     }
     val perms = PermissionState(coarse = false, fine = false)
     val northAngle = 0.0f
-    println(location)
-    MainScreen(northAngle, location, perms)
+    val showDialog = false
+    MainScreen(northAngle, location, perms, showDialog)
 }
