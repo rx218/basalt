@@ -70,7 +70,7 @@ fun MainScreen(
             )
             Text(
                 modifier = Modifier.padding(4.dp),
-                text = if(abs(kaabaBearing - northAngle) < 3) { "Pointing to Kaaba" } else {"--"},
+                text = if(abs(kaabaBearing - northAngle) < 3) { "Pointing to the Kaaba" } else {"--"},
                 style = MaterialTheme.typography.displaySmall,
                 color = Color.Green
             )
