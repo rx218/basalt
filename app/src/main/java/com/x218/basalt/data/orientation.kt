@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flowOn
 /**
  * Wraps `SensorManager.getOrientation` and `SensorManager.getRotationMatrix`
  * Supply `gravity` vector and `geomagnetic` vector from the acceleration and magnetic sensors
+ * Returns azimuth in degrees in range -180 to 180
  */
 fun getAzimuth(gravity: FloatArray, geomagnetic: FloatArray): Float {
     val R = FloatArray(9)

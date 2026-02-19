@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -17,7 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.x218.basalt.R
 import com.x218.basalt.data.PermissionState
@@ -35,29 +35,30 @@ fun LocationBar(location: Location, perms: PermissionState, onClickLocation: () 
         "${"%.2f".format(location.longitude)}°"
     }
 
+    val tint: Color = when (perms) {
+        PermissionState(coarse = true, fine = true) -> Color.Green
+        PermissionState(coarse = true, fine = false) -> Color.Yellow
+        PermissionState(coarse = false, fine = false) -> Color.Red
+        else -> Color.Gray
+    }
+
     Row(
         modifier = Modifier
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val tint: Color = when (perms) {
-            PermissionState(coarse = true, fine = true) -> Color.Green
-            PermissionState(coarse = true, fine = false) -> Color.Yellow
-            PermissionState(coarse = false, fine = false) -> Color.Red
-            else -> Color.Gray
-        }
         IconButton(
             onClick = onClickLocation
         ) {
             Icon(
-                imageVector =  Icons.Filled.LocationOn,
+                imageVector = ImageVector.vectorResource(R.drawable.location),
                 tint = tint,
                 contentDescription = stringResource(R.string.location_info)
             )
         }
 
-        VerticalDivider(color = MaterialTheme.colorScheme.primary)
+        VerticalDivider(color = MaterialTheme.colorScheme.secondary)
 
         Row (
             modifier = Modifier.weight(1f),

@@ -58,7 +58,6 @@ android {
 dependencies {
 
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.compose.material.icons.core)
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -80,18 +79,18 @@ dependencies {
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     // Instrumented tests
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    // debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // Local tests: jUnit, coroutines, Android runner
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
+    // testImplementation(libs.junit)
+    // testImplementation(libs.kotlinx.coroutines.test)
 
     // Instrumented tests: jUnit rules and runners
 
-    androidTestImplementation(libs.androidx.test.core)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.runner)
+    // androidTestImplementation(libs.androidx.test.core)
+    // androidTestImplementation(libs.androidx.test.ext.junit)
+    // androidTestImplementation(libs.androidx.test.runner)
 
     // Adhan times library
     implementation(libs.adhan2)

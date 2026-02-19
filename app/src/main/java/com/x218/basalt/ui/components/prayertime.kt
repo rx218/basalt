@@ -6,15 +6,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.batoulapps.adhan2.CalculationMethod
@@ -22,6 +26,7 @@ import com.batoulapps.adhan2.Coordinates
 import com.batoulapps.adhan2.Prayer
 import com.batoulapps.adhan2.PrayerTimes
 import com.batoulapps.adhan2.data.DateComponents
+import com.x218.basalt.R
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -57,12 +62,43 @@ fun PrayerTimeDrawer(location: Location) {
 
     Column {
         // Next prayer
-        Text("Next prayer")
-        PrayerTime(nextPrayer, nextPrayerTime)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(4.dp)
+        ) {
+            Text(
+                text = "Next prayer",
+                style = MaterialTheme.typography.displayMedium,
+            )
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.prayer_times),
+                contentDescription = "Prayer Time Icon"
+            )
+        }
 
         HorizontalDivider()
 
-        Text("Prayer Times")
+        PrayerTime(nextPrayer, nextPrayerTime)
+
+        HorizontalDivider(thickness = 3.dp)
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(4.dp)
+        ) {
+            Text(
+                text = "Prayer Times",
+                style = MaterialTheme.typography.displayMedium,
+            )
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.prayer_times),
+                contentDescription = "Prayer Time Icon"
+            )
+        }
+
+        HorizontalDivider()
 
         // list of prayers
         Column {
@@ -81,22 +117,22 @@ fun PrayerTime(prayer: Prayer, time: String) {
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            modifier = Modifier.weight(0.7f),
+            modifier = Modifier.weight(0.9f),
             text = prayer.toString(),
-            style = MaterialTheme.typography.displaySmall
+            style = MaterialTheme.typography.headlineMedium
         )
         VerticalDivider(
             modifier = Modifier.padding(16.dp, 0.dp)
         )
         Text(
-            modifier = Modifier.weight(1.3f),
+            modifier = Modifier.weight(1.1f),
             text = time,
-            style = MaterialTheme.typography.displayMedium
+            style = MaterialTheme.typography.headlineMedium
         )
     }
 }
 
-@Preview
+@Preview(widthDp = 640)
 @Composable
 fun PreviewPrayerTimeDrawer() {
     PrayerTimeDrawer(

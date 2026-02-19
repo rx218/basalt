@@ -64,4 +64,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
     }
+
+    fun unsetShowDialog() {
+        _uiState.update { currentUiState ->
+            currentUiState.copy(
+                showDialog = false
+            )
+        }
+    }
 }

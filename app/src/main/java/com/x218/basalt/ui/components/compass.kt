@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.x218.basalt.R
 
 @Composable
@@ -49,9 +51,9 @@ fun Compass(north: Float, kaabaBearing: Float) {
         Image(
             painter = painterResource(id = R.drawable.needle),
             modifier = Modifier
-                .graphicsLayer(rotationZ = needleRotation)
-                .scale(0.75f)
-                .align(Alignment.Center),
+                .align(Alignment.Center)
+                .size(300.dp)
+                .graphicsLayer(rotationZ = needleRotation),
             contentDescription = "Needle Kaaba"
         )
     }

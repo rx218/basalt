@@ -14,6 +14,7 @@ import com.x218.basalt.data.getLocation
 import com.x218.basalt.data.requestPermission
 import com.x218.basalt.ui.MainScreen
 import com.x218.basalt.ui.MainViewModel
+import com.x218.basalt.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.launch
@@ -52,7 +53,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MainScreen(viewModel)
+            AppTheme() {
+                MainScreen(viewModel)
+            }
         }
     }
 }
