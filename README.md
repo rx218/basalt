@@ -21,9 +21,10 @@ Qibla Finder is a minimal, open-source Android app that helps users determine th
 
 ## Screenshot
 
-![Home Screenshot](app_screenshot.png)
+<img src="app_screenshot.png" alt="Home Screen" width="300"/>
 
-![Prayer Times](prayertimes.png)
+### Prayer Times
+<img src="prayertimes.png" alt="Prayer Times" width="300"/>
 
 ## Installation
 
