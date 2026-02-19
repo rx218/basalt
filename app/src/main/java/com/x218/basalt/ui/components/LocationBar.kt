@@ -67,12 +67,14 @@ fun LocationBar(location: Location, perms: PermissionState, onClickLocation: () 
         ) {
             Text(
                 text = lat,
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.Black
             )
             VerticalDivider(color = MaterialTheme.colorScheme.secondary)
             Text(
                 text = long,
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.Black
             )
         }
     }

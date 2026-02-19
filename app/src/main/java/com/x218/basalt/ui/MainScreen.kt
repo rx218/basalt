@@ -93,12 +93,16 @@ fun MainScreen(
 @Composable
 fun MainScreen(northAngle: Float, location: Location, perms: PermissionState, showDialog: Boolean) {
     val kaabaBearing = location.bearingTo(kaabaLocation)
+    fun normalizeAngle(angle: Float): Float {
+        return (angle + 360) % 360
+    }
 
     BottomSheetScaffold(
         topBar = {
-            Header()
+            Header(onClickInfo = {})
         },
         sheetPeekHeight = 160.dp,
+        contentColor = MaterialTheme.colorScheme.background,
         sheetContent = {
             PrayerTimeDrawer(location)
         }
@@ -110,14 +114,27 @@ fun MainScreen(northAngle: Float, location: Location, perms: PermissionState, sh
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                modifier = Modifier.padding(4.dp),
+                text = "${normalizeAngle(northAngle).toInt()}°",
+                style = MaterialTheme.typography.displaySmall,
+                color = Color.Red
+            )
             Compass(
-                north = northAngle,
-                kaabaBearing = kaabaBearing
+                north = - northAngle,
+                kaabaBearing =  kaabaBearing
+            )
+            Text(
+                modifier = Modifier.padding(4.dp),
+                text = if(abs(kaabaBearing - northAngle) < 3) { "Pointing to the Kaaba" } else {"--"},
+                style = MaterialTheme.typography.displaySmall,
+                color = Color.Green
             )
             HorizontalDivider()
             LocationBar(
                 location = location,
-                perms = perms
+                perms =  perms,
+                onClickLocation = {}
             )
             HorizontalDivider()
         }
