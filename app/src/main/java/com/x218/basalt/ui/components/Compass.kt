@@ -6,7 +6,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,10 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.x218.basalt.R
 
 @Composable
@@ -41,6 +43,10 @@ fun Compass(north: Float, kaabaBearing: Float) {
         modifier = Modifier
             .graphicsLayer(rotationZ = northRotation)
     ) {
+        Text("N", modifier = Modifier.align(Alignment.TopCenter), color = Color.Red, fontWeight = FontWeight.ExtraBold)
+        Text("S", modifier = Modifier.align(Alignment.BottomCenter).rotate(180f), fontWeight = FontWeight.Bold)
+        Text("E", modifier = Modifier.align(Alignment.CenterEnd).rotate(90f), fontWeight = FontWeight.Bold)
+        Text("W", modifier = Modifier.align(Alignment.CenterStart).rotate(270f), fontWeight = FontWeight.Bold)
         Image(
             painter = painterResource(id = R.drawable.rose),
             modifier = Modifier
@@ -51,7 +57,7 @@ fun Compass(north: Float, kaabaBearing: Float) {
             painter = painterResource(id = R.drawable.needle),
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(300.dp)
+                .scale(1.8f)
                 .graphicsLayer(rotationZ = needleRotation),
             contentDescription = "Needle Kaaba"
         )
@@ -62,23 +68,23 @@ fun Compass(north: Float, kaabaBearing: Float) {
 @Composable
 fun PreviewCompassAdjustable() {
     Column {
-        var v1 by remember { mutableFloatStateOf(0f) }
-        var v2 by remember { mutableFloatStateOf(0f) }
-        Compass(v1, v2)
+        var north by remember { mutableFloatStateOf(0f) }
+        var kaabaBearing by remember { mutableFloatStateOf(0f) }
+        Compass(north, kaabaBearing)
         Slider(
-            value = v1,
-            onValueChange = { v1 = it },
+            value = north,
+            onValueChange = { north = it },
             valueRange = -180f..180f
         )
-        Text(text = v1.toString())
+        Text(text = north.toString())
         Slider(
-            value = v2,
-            onValueChange = { v2 = it },
+            value = kaabaBearing,
+            onValueChange = { kaabaBearing = it },
             valueRange = -180f..180f
         )
-        Text(text = v2.toString())
+        Text(text = kaabaBearing.toString())
         val rot by animateFloatAsState(
-            targetValue = v2
+            targetValue = kaabaBearing
         )
         Text(text = "Hi", modifier = Modifier.graphicsLayer(rotationZ = rot))
     }
